@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+      html {
+        background: linear-gradient(rgb(0, 0, 0) 50%, rgb(29, 155, 240) 100%);
+      }
+      #loading {
+        display: none;
+        color: #fff;
+      }
+      #floorPrice {
+        color: #fff;
+      }
+      .container {
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        font-size: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <span>X to the moon 🚀🚀🚀</span>
+      <p>
+        Follow my X:
+        <a href="https://twitter.com/xof2021" target="_blank">@xof2021</a>
+      </p>
+      <span id="loading">loading...</span>
+
+      <div id="priceBlock" style="display: none">
+        <div>
+          Floor price:
+
+          <span id="floorPrice"></span>
+        </div>
+        <div>
+          Total List:
+          <span id="totalList"></span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const main = async () => {
+        // Display loading indicator
+        document.getElementById('loading').style.display = 'block';
+
+        try {
+          const res = await axios.get(
+            'https://api.twitscription.xyz/orders?tick=X&filled=false&limit=100000',
+          );
+          const listingData = res.data.data;
+          const totalList = listingData.length;
+          listingData.forEach(listing => {
+            listing.pricePerInscription = (Number(listing.pricePerAmt) * 2000).toFixed(4);
+          });
+          const floorPrice = Math.min(
+            ...listingData.map(listing => listing.pricePerInscription),
+          );
+
+          // Update HTML content
+          document.getElementById('floorPrice').innerText = `${floorPrice} ETH`;
+          document.getElementById('totalList').innerText = `${totalList}`;
+        } catch (error) {
+          console.error('Error fetching data:', error.message);
+        } finally {
+          // Hide loading indicator
+          document.getElementById('loading').style.display = 'none';
+          // Show all price block
+          document.getElementById('priceBlock').style.display = 'block';
+        }
+      };
+
+      // Call the main function
+      main();
+    </script>
+  </body>
+</html>
